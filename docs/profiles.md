@@ -1,108 +1,128 @@
-# Perfis de Worker
+# 🧠 Perfis de Worker
 
-## O que é um perfil?
+## O que define um perfil?
 
-Cada perfil no Hermes Agent funciona como um **worker especializado**. Ele tem:
+Cada perfil no Hermes Agent é um conjunto de:
 
-- **config.yaml** — modelo, limites de iteração, provedor
-- **SOUL.md** — instruções de comportamento e personalidade
+- **`config.yaml`** — provedor, modelo, limites de iteração, ferramentas
+- **`SOUL.md`** — instruções de personalidade, regras, vedações
 
-## Perfis Criados
+Quando o orquestrador recebe uma ideia, ele escolhe o perfil ideal baseado na complexidade.
 
-### 1. Orquestrador
+---
 
-**Função:** Recebe ideias vagas, planeja, quebra em tasks e delega.
+## 1️⃣ Orquestrador
 
-| Config | Valor |
-|--------|-------|
-| max_turns | 12 |
-| reasoning_effort | low |
-| SOUL.md | 31 linhas |
+**Função:** Planejador-chefe. Decompõe ideias vagas em tasks acionáveis no Kanban.
 
-**SOUL.md (condensado):**
-- Planejador principal. Recebe ideia vaga → prompt refinado → task Kanban.
-- Decide entre perfil rápido vs sênior baseado na complexidade.
-- Usa pipeline automática em vez de follow-ups manuais.
-- Responsável por decompor problemas grandes em tasks paralelas.
+```yaml
+max_turns: 12
+reasoning_effort: low
+```
 
-### 2. Rafael (Backend Sênior)
+**Responsabilidades:**
+- Receber prompt bruto do usuário e refinar em tasks claras
+- Escolher entre perfis rápido vs sênior baseado no escopo
+- Delegar via dispatch do Kanban
+- Usar pipeline automática em vez de follow-ups manuais
 
-**Função:** APIs robustas com testes unitários, código limpo, sem erros.
+**SOUL.md (versão condensada):**
 
-| Config | Valor |
-|--------|-------|
-| max_turns | 20 |
-| reasoning_effort | (herdado) |
-| SOUL.md | 31 linhas |
-| Testes | Unitários obrigatórios |
+> Planejador principal. Recebe ideia → refina → cria tasks no Kanban. Decide entre perfil rápido ou sênior conforme a complexidade. Máximo 12 iterações. Nunca executa código diretamente — sempre delega.
+
+[📄 Ver config](profiles/orquestrador/config.yaml) · [📄 Ver SOUL.md](profiles/orquestrador/SOUL.md)
+
+---
+
+## 2️⃣ Rafael — Backend Sênior
+
+**Função:** APIs robustas, código limpo e testado.
+
+```yaml
+max_turns: 20
+```
 
 **Regras:**
-- Máximo 20 iterações — se não terminar, para e reporta
-- Todos os testes devem passar
-- Proibido criar arquivos `_debug*.py`
-- Código em arquivo único quando possível
+- Máximo 20 iterações — se não terminar, reporta e para
+- **Testes unitários obrigatórios** — todos devem passar
+- Sem arquivos `_debug*.py`
+- Código em arquivo único quando viável
 - Profissional sem ser perfeccionista ao extremo
 
-### 3. Manuel (Backend Rápido)
+**Quando usar:** CRUDs, APIs REST, serviços, sistemas com regras de negócio.
 
-**Função:** Protótipos rápidos, MVPs, testar ideias.
+[📄 Ver SOUL.md](profiles/rafael-backend-senior/SOUL.md) · [📄 Ver config](profiles/rafael-backend-senior/config.yaml)
 
-| Config | Valor |
-|--------|-------|
-| max_turns | 5 |
-| reasoning_effort | (herdado) |
-| SOUL.md | ~30 linhas |
-| Testes | Não |
+---
+
+## 3️⃣ Manuel — Backend Rápido
+
+**Função:** Protótipos, MVPs, validação de ideias.
+
+```yaml
+max_turns: 5
+```
 
 **Regras:**
 - Máximo 5 iterações — entregue rápido ou pare
-- Zero testes, zero análise prévia
+- **Zero testes** — produto mínimo viável
 - Print debugging permitido
 - Código em arquivo único
 - Foco em funcionalidade, não em qualidade
 
-### 4. Felipe — Frontend Rápido
+**Quando usar:** Testar conceito, validar viabilidade, protótipo descartável.
 
-**Função:** Telas simples com HTML/CSS/JS puro.
+[📄 Ver SOUL.md](profiles/manuel-backend-rapido/SOUL.md) · [📄 Ver config](profiles/manuel-backend-rapido/config.yaml)
 
-| Config | Valor |
-|--------|-------|
-| max_turns | 5 |
-| SOUL.md | ~30 linhas |
-| Stack | HTML + CSS + JS puro |
-| Testes | Não |
+---
+
+## 4️⃣ Felipe — Frontend Rápido
+
+**Função:** Interfaces simples em HTML/CSS/JS puro.
+
+```yaml
+max_turns: 5
+```
 
 **Regras:**
+- HTML + CSS + JavaScript puro — **sem frameworks**
+- Consumir API via fetch/ajax
+- Qualidade visual: gradientes, sombras, fonts bonitas
 - Máximo 5 iterações
-- Sem frameworks — HTML/CSS puro
-- Cliente da API, fetch/ajax
-- Qualidade visual com gradientes e sombras
 
-### 5. Felipe — Frontend Sênior
+**Quando usar:** Telas rápidas, formulários, dashboards simples.
+
+[📄 Ver SOUL.md](profiles/frontend-rapido/SOUL.md)
+
+---
+
+## 5️⃣ Felipe — Frontend Sênior
 
 **Função:** Aplicações frontend completas com framework moderno.
 
-| Config | Valor |
-|--------|-------|
-| max_turns | 25 |
-| SOUL.md | ~30 linhas |
-| Stack | React ou Vue + Vitest |
-| Testes | Obrigatórios |
+```yaml
+max_turns: 25
+```
 
 **Regras:**
-- Máximo 25 iterações
-- React (Next.js) ou Vue 3 + Vitest
-- Testes unitários obrigatórios
-- Estilo Tailwind CSS ou similar
+- React (Next.js) ou Vue 3
+- **Testes obrigatórios** com Vitest
+- Estilo com Tailwind CSS ou similar
 - Consumir API via fetch/axios
+- Máximo 25 iterações
 
-## Tabela de Decisão do Orquestrador
+**Quando usar:** Dashboards complexos, SPAs, interfaces com estado.
 
-| Tipo de Pedido | Perfil Usado |
-|----------------|-------------|
-| "API de X", "Backend de Y", "CRUD" | Rafael (backend-sênior) |
-| "Testa essa ideia", "Prototipo rapido" | Manuel (backend-rapido) |
-| "Interface bonita", "Dashboard" | Felipe (frontend-sênior) |
-| "Tela simples", "Formulario basico" | Felipe (frontend-rapido) |
-| "Deploy", "Docker" | Rafael (backend-sênior) |
-| Ideia vaga e complexa | Orquestrador → decide |
+[📄 Ver SOUL.md](profiles/frontend-senior/SOUL.md)
+
+---
+
+## Tabela de Decisão
+
+| Tipo de Pedido | Perfil | Por quê? |
+|---------------|--------|----------|
+| "API de clientes", "CRUD" | 👨‍💻 Backend Sênior | Precisa de testes e robustez |
+| "Testa essa ideia de estoque" | ⚡ Backend Rápido | Só validar conceito |
+| "Dashboard bonito" | 🏗️ Frontend Sênior | React + Tailwind |
+| "Formulário simples de cadastro" | 🎨 Frontend Rápido | HTML puro basta |
+| "Sistema completo: backend + tela" | 🎯 Orquestrador | Vai decompor e delegar |
