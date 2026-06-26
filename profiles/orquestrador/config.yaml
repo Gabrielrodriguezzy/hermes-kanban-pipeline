@@ -1,0 +1,25 @@
+model:
+  default: deepseek-chat
+  provider: deepseek
+  base_url: https://api.deepseek.com/v1
+  context_length: 65536
+  max_output_tokens: 8192
+
+toolsets:
+  - hermes-cli
+  - terminal
+  - kanban
+
+agent:
+  max_turns: 12
+  gateway_timeout: 600
+  api_max_retries: 3
+  task_completion_guidance: true
+  clarify_timeout: 300
+  verbose: false
+  reasoning_effort: low
+
+terminal:
+  backend: local
+  timeout: 120
+  persistent_shell: true

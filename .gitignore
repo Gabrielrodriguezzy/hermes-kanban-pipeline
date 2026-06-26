@@ -1,0 +1,13 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+private/
+secrets/
+_debug*.py
+_check*.py
+_test*.py
+_run*.sh
+urls.db
+.env

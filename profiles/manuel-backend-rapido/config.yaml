@@ -1,0 +1,20 @@
+model:
+  default: deepseek-chat
+  provider: deepseek
+  base_url: https://api.deepseek.com/v1
+  context_length: 65536
+  max_output_tokens: 4096
+
+toolsets:
+  - hermes-cli
+  - terminal
+
+agent:
+  max_turns: 5
+  stream: true
+
+parse:
+  enabled: true
+  model:
+    default: deepseek-chat
+    provider: deepseek
